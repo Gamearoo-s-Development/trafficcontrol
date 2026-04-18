@@ -9,7 +9,7 @@
 	"elements": [
 		{
 			"from": [6, 4, 5],
-			"to": [10, 9, 13],
+			"to": [10, 9, 11],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, 8]},
 			"faces": {
 				"north": {"uv": [0, 0, 4, 5], "texture": "#1"},
@@ -47,9 +47,9 @@
 			}
 		},
 		{
-			"from": [6.5, 5.25, 12],
-			"to": [9.5, 8.5, 13.75],
-			"rotation": {"angle": 0, "axis": "y", "origin": [7, 6, 12]},
+			"from": [6.5, 5.25, 11],
+			"to": [9.5, 8.5, 11.75],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 6, 11]},
 			"faces": {
 				"north": {"uv": [11, 5, 14, 8.25], "texture": "#0"},
 				"east": {"uv": [0.5, 10, 2, 13.25], "texture": "#0"},
