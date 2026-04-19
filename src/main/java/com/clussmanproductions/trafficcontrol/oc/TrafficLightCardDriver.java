@@ -10,8 +10,15 @@ import java.util.stream.Collectors;
 
 import com.clussmanproductions.trafficcontrol.Config;
 import com.clussmanproductions.trafficcontrol.ModItems;
+import com.clussmanproductions.trafficcontrol.blocks.BlockPedestrianButton;
+import com.clussmanproductions.trafficcontrol.blocks.BlockTrafficSensorLeft;
+import com.clussmanproductions.trafficcontrol.blocks.BlockTrafficSensorRight;
+import com.clussmanproductions.trafficcontrol.blocks.BlockTrafficSensorStraight;
 import com.clussmanproductions.trafficcontrol.item.ItemTrafficLightCard;
 import com.clussmanproductions.trafficcontrol.tileentity.BaseTrafficLightTileEntity;
+import com.clussmanproductions.trafficcontrol.tileentity.PedestrianButtonTileEntity;
+import com.clussmanproductions.trafficcontrol.tileentity.TrafficLightControlBoxTileEntity;
+import com.clussmanproductions.trafficcontrol.util.CustomAngleCalculator;
 import com.clussmanproductions.trafficcontrol.util.EnumTrafficLightBulbTypes;
 
 import li.cil.oc.api.Network;
@@ -26,12 +33,28 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Visibility;
 import li.cil.oc.api.prefab.AbstractManagedEnvironment;
 import li.cil.oc.api.prefab.DriverItem;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
 public class TrafficLightCardDriver extends DriverItem {
+
+	private static boolean entityMatchesSensorClasses(net.minecraft.entity.Entity e) {
+		return Arrays.stream(Config.sensorClasses).anyMatch(eName -> {
+			Class<?> nextClass = e.getClass();
+			while (nextClass != null) {
+				if (eName.equals(nextClass.getName())) {
+					return true;
+				}
+				nextClass = nextClass.getSuperclass();
+			}
+			return false;
+		});
+	}
 
 	public TrafficLightCardDriver()
 	{
@@ -74,7 +97,180 @@ public class TrafficLightCardDriver extends DriverItem {
 			this.host = host;
 			setNode(Network.newNode(this, Visibility.Neighbors).withComponent("traffic_light_card").withConnector(300).create());
 		}
-		
+
+		private static final int MAX_SENSORS_AND_PED_BUTTONS = 8;
+
+		@Callback(doc = "pairSensor(x:int, y:int, z:int):boolean OR pairSensor(id:long):boolean -- Pairs or unpairs a sensor to this card")
+		public Object[] pairSensor(Context c, Arguments args) throws Exception {
+			BlockPos pos = getBlockPosFromArgs(args);
+			NBTTagCompound tag = card.getTagCompound();
+			if (tag == null) {
+				tag = new NBTTagCompound();
+				card.setTagCompound(tag);
+			}
+
+			long id = pos.toLong();
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("sensor" + i) && tag.getLong("sensor" + i) == id) {
+					tag.removeTag("sensor" + i);
+					return new Object[] { false, "Unpaired" };
+				}
+			}
+
+			int count = 0;
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("sensor" + i)) {
+					count++;
+				}
+			}
+			if (count >= MAX_SENSORS_AND_PED_BUTTONS) {
+				return new Object[] { false, "Max sensors reached" };
+			}
+
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (!tag.hasKey("sensor" + i)) {
+					tag.setLong("sensor" + i, id);
+					return new Object[] { true, "Paired" };
+				}
+			}
+
+			return new Object[] { false, "Unexpected" };
+		}
+
+		@Callback(doc = "pairPedButton(x:int, y:int, z:int):boolean, string OR pairPedButton(id:long):boolean, string -- Pairs or unpairs a pedestrian button to this card")
+		public Object[] pairPedButton(Context c, Arguments args) throws Exception {
+			BlockPos pos = getBlockPosFromArgs(args);
+			NBTTagCompound tag = card.getTagCompound();
+			if (tag == null) {
+				tag = new NBTTagCompound();
+				card.setTagCompound(tag);
+			}
+
+			long id = pos.toLong();
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("pedButton" + i) && tag.getLong("pedButton" + i) == id) {
+					tag.removeTag("pedButton" + i);
+					return new Object[] { false, "Unpaired" };
+				}
+			}
+
+			int count = 0;
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("pedButton" + i)) {
+					count++;
+				}
+			}
+			if (count >= MAX_SENSORS_AND_PED_BUTTONS) {
+				return new Object[] { false, "Max ped buttons reached" };
+			}
+
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (!tag.hasKey("pedButton" + i)) {
+					tag.setLong("pedButton" + i, id);
+					return new Object[] { true, "Paired" };
+				}
+			}
+
+			return new Object[] { false, "Unexpected" };
+		}
+
+		@Callback(doc = "listPedButtons():array -- Returns a list of pedestrian button positions paired to this card")
+		public Object[] listPedButtons(Context c, Arguments args) {
+			NBTTagCompound tag = card.getTagCompound();
+			if (tag == null) {
+				return new Object[] { new ArrayList<Integer[]>() };
+			}
+
+			ArrayList<Integer[]> buttons = new ArrayList<>();
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("pedButton" + i)) {
+					BlockPos p = BlockPos.fromLong(tag.getLong("pedButton" + i));
+					buttons.add(new Integer[] { p.getX(), p.getY(), p.getZ() });
+				}
+			}
+
+			return new Object[] { buttons };
+		}
+
+		@Callback(doc = "pressPedButton(x:int, y:int, z:int):boolean, string OR pressPedButton(id:long):boolean, string -- Simulates pressing a pedestrian button")
+		public Object[] pressPedButton(Context c, Arguments args) throws Exception {
+			BlockPos pos = getBlockPosFromArgs(args);
+
+			TileEntity te = host.world().getTileEntity(pos);
+			if (!(te instanceof PedestrianButtonTileEntity)
+					|| !(host.world().getBlockState(pos).getBlock() instanceof BlockPedestrianButton)) {
+				return new Object[] { false, "No pedestrian button at given position" };
+			}
+
+			int rotation = host.world().getBlockState(pos).getValue(BlockPedestrianButton.ROTATION);
+			PedestrianButtonTileEntity pedTE = (PedestrianButtonTileEntity) te;
+			int queued = 0;
+
+			for (BlockPos controller : new ArrayList<>(pedTE.getPairedBoxes())) {
+				TileEntity ctrlTE = host.world().getTileEntity(controller);
+				if (!(ctrlTE instanceof TrafficLightControlBoxTileEntity)) {
+					pedTE.removePairedBox(controller);
+					continue;
+				}
+
+				TrafficLightControlBoxTileEntity ctrlr = (TrafficLightControlBoxTileEntity) ctrlTE;
+				if (CustomAngleCalculator.isNorthSouth(rotation)) {
+					ctrlr.getAutomator().setWestEastPedQueued(true);
+				} else {
+					ctrlr.getAutomator().setNorthSouthPedQueued(true);
+				}
+
+				ctrlr.markDirty();
+				host.world().notifyBlockUpdate(controller, host.world().getBlockState(controller),
+						host.world().getBlockState(controller), 3);
+				queued++;
+			}
+
+			return new Object[] { true, "Queued for " + queued + " controller(s)" };
+		}
+
+		@Callback(doc = "listSensors():array -- Returns a list of sensor positions")
+		public Object[] listSensors(Context c, Arguments args) {
+			NBTTagCompound tag = card.getTagCompound();
+			if (tag == null) {
+				return new Object[] { new ArrayList<Integer[]>() };
+			}
+
+			ArrayList<Integer[]> sensors = new ArrayList<>();
+			for (int i = 0; i < MAX_SENSORS_AND_PED_BUTTONS; i++) {
+				if (tag.hasKey("sensor" + i)) {
+					BlockPos p = BlockPos.fromLong(tag.getLong("sensor" + i));
+					sensors.add(new Integer[] { p.getX(), p.getY(), p.getZ() });
+				}
+			}
+
+			return new Object[] { sensors };
+		}
+
+		@Callback(doc = "isSensorTripped(x:int, y:int, z:int):boolean OR isSensorTripped(id:long):boolean -- Optional width, height, length after coordinates (defaults -1, sensorScanHeight, 1)")
+		public Object[] isSensorTripped(Context c, Arguments args) throws Exception {
+			BlockPos pos = getBlockPosFromArgs2(args);
+
+			IBlockState state = host.world().getBlockState(pos);
+			if (!(state.getBlock() instanceof BlockTrafficSensorLeft
+					|| state.getBlock() instanceof BlockTrafficSensorRight
+					|| state.getBlock() instanceof BlockTrafficSensorStraight)) {
+				return new Object[] { false };
+			}
+
+			int width = args.count() >= 4 ? args.checkInteger(3) : -1;
+			int height = args.count() >= 5 ? args.checkInteger(4) : Config.sensorScanHeight;
+			int length = args.count() >= 6 ? args.checkInteger(5) : 1;
+
+			boolean tripped = host.world()
+					.getEntitiesWithinAABBExcludingEntity(null,
+							new AxisAlignedBB(pos).grow(width / 2.0, height / 2.0, length / 2.0))
+					.stream()
+					.anyMatch(e -> (e instanceof EntityPlayerMP) || TrafficLightCardDriver.entityMatchesSensorClasses(e));
+
+			return new Object[] { tripped };
+		}
+
 		@Callback(direct = true, doc = "listBlockPos():array -- Retrieves a list of block positions currently in use by the card")
 		public Object[] listBlockPos(Context c, Arguments args)
 		{
@@ -310,45 +506,41 @@ public class TrafficLightCardDriver extends DriverItem {
 			}
 		}
 		
-		private BlockPos getBlockPosFromArgs(Arguments args) throws Exception
-		{
-			// Check valid args
-			if (!(args.isInteger(0) && args.isInteger(1) && args.isInteger(2)) ||
-				!args.isDouble(0))
-			{
-				throw new IllegalArgumentException("Invalid argument format");
+		private BlockPos getBlockPosFromArgs2(Arguments args) throws Exception {
+			if (args.count() >= 3 && args.isInteger(0) && args.isInteger(1) && args.isInteger(2)) {
+				return new BlockPos(args.checkInteger(0), args.checkInteger(1), args.checkInteger(2));
 			}
-			
-			BlockPos pos;
-			if (args.isInteger(0) && args.isInteger(1) && args.isInteger(2))
-			{
-				pos = new BlockPos(args.checkInteger(0), args.checkInteger(1), args.checkInteger(2));
-			}
-			else if (args.isDouble(0) && args.isString(1))
-			{
+			if (args.count() >= 1 && args.isDouble(0)) {
 				double posIDDouble = args.checkDouble(0);
-				pos = BlockPos.fromLong((long)posIDDouble);
+				return BlockPos.fromLong((long) posIDDouble);
 			}
-			else
-			{
-				throw new IllegalArgumentException("Could not determine block position");
-			}
-			
-			return pos;
+			throw new IllegalArgumentException("Could not determine block position");
 		}
-		
-		private boolean cardContainsPos(BlockPos pos)
-		{
+
+		private BlockPos getBlockPosFromArgs(Arguments args) throws Exception {
+			if (args.count() >= 3 && args.isInteger(0) && args.isInteger(1) && args.isInteger(2)) {
+				return new BlockPos(args.checkInteger(0), args.checkInteger(1), args.checkInteger(2));
+			}
+			if (args.count() >= 1 && args.isDouble(0)) {
+				double posIDDouble = args.checkDouble(0);
+				return BlockPos.fromLong((long) posIDDouble);
+			}
+			throw new IllegalArgumentException("Could not determine block position");
+		}
+
+		private boolean cardContainsPos(BlockPos pos) {
+			NBTTagCompound tag = card.getTagCompound();
+			if (tag == null) {
+				return false;
+			}
 			long id = pos.toLong();
-			for(String lightKey : card.getTagCompound().getKeySet().stream().filter(key -> key.startsWith("light")).collect(Collectors.toList()))
-			{
-				long tagKey = card.getTagCompound().getLong(lightKey);
-				if (tagKey == id)
-				{
+			for (String lightKey : tag.getKeySet().stream().filter(key -> key.startsWith("light")).collect(Collectors.toList())) {
+				long tagKey = tag.getLong(lightKey);
+				if (tagKey == id) {
 					return true;
 				}
 			}
-			
+
 			return false;
 		}
 	}
