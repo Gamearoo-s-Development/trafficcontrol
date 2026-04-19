@@ -4,6 +4,7 @@ import com.clussmanproductions.trafficcontrol.ModTrafficControl;
 import com.clussmanproductions.trafficcontrol.util.CustomAngleCalculator;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Block.EnumOffsetType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
@@ -17,6 +18,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
@@ -34,6 +36,25 @@ public class BlockDrum extends Block {
 		setHardness(1f);
         setHarvestLevel("pickaxe", 0);
 		setCreativeTab(ModTrafficControl.CREATIVE_TAB);
+	}
+
+	@Override
+	public EnumOffsetType getOffsetType() {
+		return EnumOffsetType.XYZ;
+	}
+
+	@Override
+	public Vec3d getOffset(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+		BlockPos below = pos.down();
+		IBlockState stateBelow = worldIn.getBlockState(below);
+		AxisAlignedBB bb = stateBelow.getBoundingBox(worldIn, below);
+		double offsetY = 1.0 - bb.maxY;
+		return new Vec3d(0, -offsetY, 0);
+	}
+
+	@Override
+	public boolean isTopSolid(IBlockState state) {
+		return false;
 	}
 	
 	public void initModel()
