@@ -11,8 +11,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ModBlocks {
 	@ObjectHolder("crossing_gate_base")
 	public static BlockCrossingGateBase crossing_gate_base;
+	@ObjectHolder("pole_base")
+	public static BlockPoleBase pole_base;
 	@ObjectHolder("stand")
 	public static BlockStand stand;
+	@ObjectHolder("quiet_zone_signal")
+	public static BlockQuietZoneSignal quiet_zone_signal;
 	@ObjectHolder("crossing_gate_gate")
 	public static BlockCrossingGateGate crossing_gate_gate;
 	@ObjectHolder("crossing_gate_lamps")
@@ -120,7 +124,9 @@ public class ModBlocks {
 	public static void initModels(ModelRegistryEvent e)
 	{
 		crossing_gate_base.initModel();
+		pole_base.initModel();
 		stand.initModel();
+		quiet_zone_signal.initModel();
 		crossing_gate_gate.initModel();
 		crossing_gate_lamps.initModel();
 		crossing_gate_pole.initModel();
