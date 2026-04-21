@@ -1,4 +1,10 @@
-{ 
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "opencomputers"
+    }
+  ],
   "type": "trafficcontrol:traffic_light_cards",
   "pattern": [
     " M ",

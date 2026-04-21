@@ -15,6 +15,7 @@ import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateBase;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateCrossbuck;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateGate;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateLamps;
+import com.clussmanproductions.trafficcontrol.blocks.BlockPedCrossingLamps;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGatePole;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingRelayNE;
 import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingRelayNW;
@@ -139,6 +140,7 @@ public class CommonProxy {
 		e.getRegistry().register(new BlockQuietZoneSignal());
 		e.getRegistry().register(new BlockCrossingGateGate());
 		e.getRegistry().register(new BlockCrossingGateLamps());
+		e.getRegistry().register(new BlockPedCrossingLamps());
 		e.getRegistry().register(new BlockCrossingGatePole());
 		e.getRegistry().register(new BlockCrossingGateCrossbuck());
 		e.getRegistry().register(new BlockSafetranType3());
@@ -241,6 +243,7 @@ public class CommonProxy {
 		e.getRegistry().register(new ItemBlock(ModBlocks.quiet_zone_signal).setRegistryName(ModBlocks.quiet_zone_signal.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.crossing_gate_gate).setRegistryName(ModBlocks.crossing_gate_gate.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.crossing_gate_lamps).setRegistryName(ModBlocks.crossing_gate_lamps.getRegistryName()));
+		e.getRegistry().register(new ItemBlock(ModBlocks.ped_crossing_lamps).setRegistryName(ModBlocks.ped_crossing_lamps.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.crossing_gate_pole).setRegistryName(ModBlocks.crossing_gate_pole.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.crossing_gate_crossbuck).setRegistryName(ModBlocks.crossing_gate_crossbuck.getRegistryName()));
 		e.getRegistry().register(new ItemBlock(ModBlocks.safetran_type_3).setRegistryName(ModBlocks.safetran_type_3.getRegistryName()));

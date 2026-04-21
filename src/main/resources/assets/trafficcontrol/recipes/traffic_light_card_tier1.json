@@ -1,19 +1,24 @@
-{ 
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "opencomputers"
+    }
+  ],
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " T ",
     " C ",
-    "   "  ],
+    "   "
+  ],
   "key": {
-  "T":
-	  {
-	  	"item": "trafficcontrol:crossing_relay_tuner"
-	  },
-	"C":
-	  {
-	    "item": "opencomputers:upgrade",
-	    "data": 31
-	  }
+    "T": {
+      "item": "trafficcontrol:crossing_relay_tuner"
+    },
+    "C": {
+      "item": "opencomputers:upgrade",
+      "data": 31
+    }
   },
   "result": {
     "item": "trafficcontrol:traffic_light_card",

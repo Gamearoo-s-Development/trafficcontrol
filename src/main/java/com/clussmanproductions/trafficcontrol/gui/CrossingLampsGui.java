@@ -7,8 +7,8 @@ import java.util.function.Supplier;
 
 import org.lwjgl.opengl.GL11;
 
-import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateLamps;
 import com.clussmanproductions.trafficcontrol.blocks.BlockOverheadLamps;
+import com.clussmanproductions.trafficcontrol.blocks.BlockRotatableCrossingLamps;
 import com.clussmanproductions.trafficcontrol.tileentity.CrossingLampsTileEntity;
 
 import net.minecraft.block.state.IBlockState;
@@ -40,9 +40,9 @@ public class CrossingLampsGui extends GuiScreen {
 		this.te = te;
 		this.modelPrefix = modelPrefix;
 		IBlockState state = te.getWorld().getBlockState(te.getPos());
-		if (state.getBlock() instanceof BlockCrossingGateLamps)
+		if (state.getBlock() instanceof BlockRotatableCrossingLamps)
 		{
-			rotation = state.getValue(BlockCrossingGateLamps.ROTATION);
+			rotation = state.getValue(BlockRotatableCrossingLamps.ROTATION);
 			baseModelVariant = "rotation=0,state=off";
 		}
 		else

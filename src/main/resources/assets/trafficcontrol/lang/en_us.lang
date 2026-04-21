@@ -5,6 +5,7 @@ tile.trafficcontrol.crossing_gate_base.name=Railroad Crossing Base
 tile.trafficcontrol.pole_base.name=Pole Base
 tile.trafficcontrol.crossing_gate_gate.name=Crossing Gate
 tile.trafficcontrol.crossing_gate_lamps.name=Crossing Lamps
+tile.trafficcontrol.ped_crossing_lamps.name=Pedestrian Crossing Lamps
 tile.trafficcontrol.crossing_gate_pole.name=Pole
 tile.trafficcontrol.crossing_gate_crossbuck.name=Crossbuck (Pole)
 tile.trafficcontrol.safetran_type_3.name=SafeTran Type 3 Electronic Bell

@@ -7,8 +7,8 @@ import javax.vecmath.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.clussmanproductions.trafficcontrol.blocks.BlockCrossingGateLamps;
 import com.clussmanproductions.trafficcontrol.blocks.BlockLampBase;
+import com.clussmanproductions.trafficcontrol.blocks.BlockRotatableCrossingLamps;
 import com.clussmanproductions.trafficcontrol.blocks.BlockOverheadLamps;
 import com.clussmanproductions.trafficcontrol.tileentity.CrossingLampsTileEntity;
 
@@ -70,18 +70,18 @@ public class CrossingLampsRenderer extends TileEntitySpecialRenderer<CrossingLam
 		boolean east = false;
 		boolean down = false;
 		
-		if (blockState.getBlock() instanceof BlockCrossingGateLamps)
+		if (blockState.getBlock() instanceof BlockRotatableCrossingLamps)
 		{
-			GlStateManager.rotate(blockState.getValue(BlockCrossingGateLamps.ROTATION) * -22.5F + 180F, 0, 1, 0);
+			GlStateManager.rotate(blockState.getValue(BlockRotatableCrossingLamps.ROTATION) * -22.5F + 180F, 0, 1, 0);
 			isCrossingGateLamps = true;
 			IExtendedBlockState exState = (IExtendedBlockState)blockState.getBlock().getExtendedState(blockState, te.getWorld(), te.getPos());
 			if (exState != null)
 			{
-				north = exState.getValue(BlockCrossingGateLamps.NORTH);
-				west = exState.getValue(BlockCrossingGateLamps.WEST);
-				south = exState.getValue(BlockCrossingGateLamps.SOUTH);
-				east = exState.getValue(BlockCrossingGateLamps.EAST);
-				down = exState.getValue(BlockCrossingGateLamps.DOWN);				
+				north = exState.getValue(BlockRotatableCrossingLamps.NORTH);
+				west = exState.getValue(BlockRotatableCrossingLamps.WEST);
+				south = exState.getValue(BlockRotatableCrossingLamps.SOUTH);
+				east = exState.getValue(BlockRotatableCrossingLamps.EAST);
+				down = exState.getValue(BlockRotatableCrossingLamps.DOWN);				
 			}
 		}
 		else

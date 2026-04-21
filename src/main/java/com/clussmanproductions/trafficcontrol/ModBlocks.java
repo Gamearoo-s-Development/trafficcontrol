@@ -21,6 +21,8 @@ public class ModBlocks {
 	public static BlockCrossingGateGate crossing_gate_gate;
 	@ObjectHolder("crossing_gate_lamps")
 	public static BlockCrossingGateLamps crossing_gate_lamps;
+	@ObjectHolder("ped_crossing_lamps")
+	public static BlockPedCrossingLamps ped_crossing_lamps;
 	@ObjectHolder("crossing_gate_pole")
 	public static BlockCrossingGatePole crossing_gate_pole;
 	@ObjectHolder("crossing_gate_crossbuck")
@@ -129,6 +131,7 @@ public class ModBlocks {
 		quiet_zone_signal.initModel();
 		crossing_gate_gate.initModel();
 		crossing_gate_lamps.initModel();
+		ped_crossing_lamps.initModel();
 		crossing_gate_pole.initModel();
 		crossing_gate_crossbuck.initModel();
 		safetran_type_3.initModel();

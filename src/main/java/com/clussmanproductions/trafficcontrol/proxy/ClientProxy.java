@@ -85,6 +85,7 @@ public class ClientProxy extends CommonProxy {
 				{
 					bakeModel(e, new ModelResourceLocation(ModTrafficControl.MODID + ":crossing_gate_lamps_" + direction + "_lamp", "rotation=" + i + ",state=" + flashState.getName()));
 					bakeModel(e, new ModelResourceLocation(ModTrafficControl.MODID + ":overhead_lamps_" + direction + "_lamp", "rotation=" + i + ",state=" + flashState.getName()));
+					bakeModel(e, new ModelResourceLocation(ModTrafficControl.MODID + ":ped_crossing_lamps_" + direction + "_lamp", "rotation=" + i + ",state=" + flashState.getName()));
 				}
 			}
 		}
